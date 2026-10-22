@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: jokes
+      POSTGRES_USER: joke
+      POSTGRES_PASSWORD: localpass
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U joke -d jokes"]
+      interval: 3s
+      retries: 10
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: jokes
+      DB_USER: joke
+      DB_PASSWORD: localpass
+    depends_on:
+      db:
+        condition: service_healthy
